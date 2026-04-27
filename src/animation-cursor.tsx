@@ -2,8 +2,18 @@
 
 import { motion } from 'motion/react';
 
-import { cn, CURSOR_DATA_ATTR } from './utils';
-import type { Anchor, FractionalAnchor } from './ref';
+import { createRef, type Anchor, type FractionalAnchor } from './ref';
+import { cn, CURSOR_REF_NAME } from './utils';
+
+/**
+ * Built-in ref for the animation cursor. `<AnimationCursor>` binds itself to
+ * this ref automatically — scripts can read/write the cursor like any other
+ * element:
+ *
+ *     await ctx.snap(cursorRef, { x: 40, y: 40, opacity: 0 });
+ *     await ctx.animate(cursorRef, { opacity: 0 }, { duration: 0.3 });
+ */
+export const cursorRef = createRef(CURSOR_REF_NAME);
 
 interface AnimationCursorProps {
   className?: string;
@@ -12,7 +22,7 @@ interface AnimationCursorProps {
 export function AnimationCursor({ className }: AnimationCursorProps) {
   return (
     <motion.svg
-      {...{ [CURSOR_DATA_ATTR]: '' }}
+      {...cursorRef.bind()}
       initial={{ opacity: 0, x: 0, y: 0 }}
       viewBox="0 0 20 20"
       className={cn(
@@ -48,9 +58,7 @@ export function createCursorTarget(container: HTMLElement) {
     const targetRect = el.getBoundingClientRect();
 
     const fractional: FractionalAnchor =
-      typeof anchor === 'string'
-        ? ANCHOR_TO_FRACTION[anchor]
-        : anchor;
+      typeof anchor === 'string' ? ANCHOR_TO_FRACTION[anchor] : anchor;
 
     const targetX =
       targetRect.left + targetRect.width * fractional.x - containerRect.left;

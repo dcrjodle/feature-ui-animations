@@ -1,6 +1,6 @@
 {
   "name": "feature-ui-animations",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Scriptable, ref-based UI animation engine. Drive any React component with cursor moves, clicks, animations, and imperative handles.",
   "license": "MIT",
   "author": "dcrjodle",

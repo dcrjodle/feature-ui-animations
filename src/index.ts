@@ -1,6 +1,7 @@
 export {
   AnimationCursor,
   createCursorTarget,
+  cursorRef,
   CURSOR_TIP_X,
   CURSOR_TIP_Y,
 } from './animation-cursor';

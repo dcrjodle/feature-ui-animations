@@ -6,9 +6,16 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export const REF_DATA_ATTR = 'data-fua-ref';
+export const REF_KEY_ATTR = 'data-fua-key';
 export const HOVER_DATA_ATTR = 'data-fua-hover';
-export const CURSOR_DATA_ATTR = 'data-fua-cursor';
 
-export const refSelector = (name: string): string =>
-  `[${REF_DATA_ATTR}="${name}"]`;
-export const cursorSelector: string = `[${CURSOR_DATA_ATTR}]`;
+export const refSelector = (name: string, key?: string): string =>
+  key === undefined
+    ? `[${REF_DATA_ATTR}="${name}"]`
+    : `[${REF_DATA_ATTR}="${name}"][${REF_KEY_ATTR}="${escapeKey(key)}"]`;
+
+const escapeKey = (key: string) => key.replace(/"/g, '\\"');
+
+/** Internal name reserved for the built-in cursor ref. */
+export const CURSOR_REF_NAME = 'fua:cursor';
+export const cursorSelector: string = refSelector(CURSOR_REF_NAME);

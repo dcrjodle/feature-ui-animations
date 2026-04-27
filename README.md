@@ -101,6 +101,38 @@ trigger.at({ x: 0.5, y: 0.5 })   // fractional
 
 `ctx.click(trigger)` defaults to `trigger.center`.
 
+### Keyed refs (one-of-many)
+
+For dynamic lists, declare a single ref and bind each item with a key:
+
+```tsx
+const row = createRef('job-row');
+
+{jobs.map((j) => (
+  <TableRow key={j.id} {...row.bind(j.id)}>...</TableRow>
+))}
+```
+
+Then in scripts:
+
+```ts
+await ctx.click(row.key('build-42'));
+await ctx.hoverSequence(jobs.map((j) => row.key(j.id)));
+```
+
+`row.key(id)` returns a sub-ref with its own selector and `bind()` — addressable, animatable, and invokable just like a regular ref.
+
+### Cursor as a ref
+
+`cursorRef` is exported and bound automatically by `<AnimationCursor>`. Use it like any other ref:
+
+```ts
+await ctx.snap(cursorRef, { x: 40, y: 40, opacity: 0 });
+await ctx.animate(cursorRef, { opacity: 0 }, { duration: 0.3 });
+```
+
+`ctx.showCursor()` / `ctx.hideCursor({ duration })` are sugar over the same calls.
+
 ### Handles
 
 Components register imperative handles so scripts can drive state without poking the DOM:

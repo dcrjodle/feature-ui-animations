@@ -1,4 +1,4 @@
-import { REF_DATA_ATTR, refSelector } from './utils';
+import { REF_DATA_ATTR, REF_KEY_ATTR, refSelector } from './utils';
 
 export type Anchor =
   | 'center'
@@ -18,11 +18,28 @@ export interface RefPosition<Handles extends string = string> {
   anchor: Anchor | FractionalAnchor;
 }
 
+export type RefBindAttrs =
+  | { [REF_DATA_ATTR]: string }
+  | { [REF_DATA_ATTR]: string; [REF_KEY_ATTR]: string };
+
 export interface ScriptRef<Handles extends string = string> {
   __fuaRef: true;
   name: string;
+  /** The ref's key, if this is a keyed sub-ref produced by `ref.key(value)`. */
+  refKey: string | undefined;
   selector: string;
-  bind: () => { [REF_DATA_ATTR]: string };
+
+  /**
+   * Spread onto an element to mark it as this ref's target. Pass an optional
+   * key for keyed refs (one-of-many — e.g. table rows by id).
+   */
+  bind(key?: string): RefBindAttrs;
+
+  /**
+   * Address one specific instance of a keyed ref. Returns a sub-ref with its
+   * own selector and bind() for that key.
+   */
+  key(value: string): ScriptRef<Handles>;
 
   /** Default position used when this ref is passed directly. Equals `center`. */
   readonly center: RefPosition<Handles>;
@@ -52,22 +69,35 @@ export interface CreateRefOptions<Handles extends string> {
   handles?: readonly Handles[];
 }
 
-export function createRef<Handles extends string = string>(
-  name: string,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  _options: CreateRefOptions<Handles> = {},
-): ScriptRef<Handles> {
-  if (!name || /\s/.test(name)) {
-    throw new Error(
-      `[feature-ui-animations] Invalid ref name "${name}". Use a non-empty string with no whitespace.`,
-    );
-  }
+interface InternalCreateOptions<H extends string> extends CreateRefOptions<H> {
+  refKey?: string;
+}
 
-  const ref: ScriptRef<Handles> = {
+function buildRef<H extends string>(
+  name: string,
+  options: InternalCreateOptions<H>,
+): ScriptRef<H> {
+  const { refKey } = options;
+  const selector = refSelector(name, refKey);
+
+  const ref: ScriptRef<H> = {
     __fuaRef: true,
     name,
-    selector: refSelector(name),
-    bind: () => ({ [REF_DATA_ATTR]: name }),
+    refKey,
+    selector,
+    bind(key) {
+      const effectiveKey = key ?? refKey;
+      if (effectiveKey === undefined) {
+        return { [REF_DATA_ATTR]: name };
+      }
+      return {
+        [REF_DATA_ATTR]: name,
+        [REF_KEY_ATTR]: effectiveKey,
+      };
+    },
+    key(value) {
+      return buildRef<H>(name, { ...options, refKey: value });
+    },
     get center() {
       return makePosition(ref, 'center');
     },
@@ -89,6 +119,18 @@ export function createRef<Handles extends string = string>(
   };
 
   return ref;
+}
+
+export function createRef<Handles extends string = string>(
+  name: string,
+  options: CreateRefOptions<Handles> = {},
+): ScriptRef<Handles> {
+  if (!name || /\s/.test(name)) {
+    throw new Error(
+      `[feature-ui-animations] Invalid ref name "${name}". Use a non-empty string with no whitespace.`,
+    );
+  }
+  return buildRef<Handles>(name, options);
 }
 
 export const isRef = (value: unknown): value is ScriptRef =>

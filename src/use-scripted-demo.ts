@@ -84,7 +84,7 @@ export interface ScriptContext {
     options?: AnimateOptions,
   ) => Promise<void>;
 
-  hideCursor: () => Promise<void>;
+  hideCursor: (opts?: { duration?: number }) => Promise<void>;
   showCursor: (opts?: { duration?: number }) => Promise<void>;
 
   /** Move the cursor to the position of a ref (defaults to center). */
@@ -165,10 +165,12 @@ export function useScriptedDemo(
     const animateValues: ScriptContext['animate'] = (ref, values, opts) =>
       animate(ref.selector, values, opts).then(() => undefined);
 
-    const hideCursor: ScriptContext['hideCursor'] = async () => {
+    const hideCursor: ScriptContext['hideCursor'] = async ({
+      duration = 0,
+    } = {}) => {
       const cursor = findCursor();
       if (!cursor) return;
-      await animate(cursor, { opacity: 0 }, { duration: 0 });
+      await animate(cursor, { opacity: 0 }, { duration });
     };
 
     const showCursor: ScriptContext['showCursor'] = async ({

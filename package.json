@@ -1,0 +1,65 @@
+{
+  "name": "feature-ui-animations",
+  "version": "0.1.0",
+  "description": "Scriptable, ref-based UI animation engine. Drive any React component with cursor moves, clicks, animations, and imperative handles.",
+  "license": "MIT",
+  "author": "dcrjodle",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dcrjodle/feature-ui-animations.git"
+  },
+  "homepage": "https://github.com/dcrjodle/feature-ui-animations",
+  "bugs": {
+    "url": "https://github.com/dcrjodle/feature-ui-animations/issues"
+  },
+  "keywords": [
+    "react",
+    "animation",
+    "motion",
+    "demo",
+    "scripted",
+    "cursor",
+    "framer-motion"
+  ],
+  "type": "module",
+  "sideEffects": false,
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "typecheck": "tsc --noEmit",
+    "prepublishOnly": "npm run build"
+  },
+  "dependencies": {
+    "clsx": "^2.1.1",
+    "tailwind-merge": "^3.5.0"
+  },
+  "peerDependencies": {
+    "motion": ">=12",
+    "react": ">=18",
+    "react-dom": ">=18"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.10",
+    "@types/react-dom": "^19.0.4",
+    "motion": "^12.38.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "tsup": "^8.3.5",
+    "typescript": "^5.9.3"
+  }
+}
